@@ -1,0 +1,20 @@
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+/.next/
+/out/
+
+# misc
+.DS_Store
+.env.local
+.env.*.local
+.swc/
+.vscode/
+
+# next.js specific
+next-env.d.ts
