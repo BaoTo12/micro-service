@@ -1,6 +1,6 @@
 package com.example.microservice.order_service.model;
 
-import com.example.microservice.order_service.UserDto;
+import com.example.microservice.order_service.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

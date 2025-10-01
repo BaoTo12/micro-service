@@ -1,5 +1,6 @@
-package com.example.microservice.order_service;
+package com.example.microservice.order_service.open_feign;
 
+import com.example.microservice.order_service.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 @Component
