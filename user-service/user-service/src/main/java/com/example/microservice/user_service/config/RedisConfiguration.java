@@ -31,9 +31,10 @@ public class RedisConfiguration {
         cacheConfiguration.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
         cacheConfiguration.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonRedisSerializer));
 
-
         return RedisCacheManager.builder()
                 .cacheDefaults(cacheConfiguration)
+                .withCacheConfiguration("users", cacheConfiguration.entryTtl(Duration.ofMinutes(10)))
+                .withCacheConfiguration("userCounts", cacheConfiguration.entryTtl(Duration.ofMinutes(5)))
                 .build();
     }
 
