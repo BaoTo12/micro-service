@@ -3,6 +3,8 @@ package com.example.microservice.order_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "orders")
 @Getter
@@ -20,6 +22,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
+    private Double total;
 
 
     public enum OrderStatus {

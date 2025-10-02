@@ -1,5 +1,6 @@
 package com.example.microservice.order_service.service.impl;
 
+import com.example.microservice.order_service.event.OrderPlacedEvent;
 import com.example.microservice.order_service.mapper.OrderMapper;
 import com.example.microservice.order_service.model.Order;
 import com.example.microservice.order_service.model.OrderResponse;
@@ -9,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +26,21 @@ public class OrderServiceImpl implements OrderService {
 
     OrderRepository orderRepository;
     OrderMapper orderMapper;
+    KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+    static String TOPIC_CREATE_ORDER = "order-creation";
 
     @Override
     public OrderResponse createOrder(Order order) {
         Order saveOrder = orderRepository.save(order);
+        // TODO create event
+        OrderPlacedEvent event = OrderPlacedEvent.builder()
+                .orderId(saveOrder.getId())
+                .userId(saveOrder.getUserId())
+                .total(saveOrder.getTotal())
+                .build();
+
+        kafkaTemplate.send(TOPIC_CREATE_ORDER, event);
+
         return orderMapper.toOrderResponse(saveOrder);
     }
 

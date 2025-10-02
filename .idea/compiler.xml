@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
+        <module name="notification-service" />
         <module name="discovery-server" />
       </profile>
       <profile name="Annotation profile for order-service" enabled="true">
