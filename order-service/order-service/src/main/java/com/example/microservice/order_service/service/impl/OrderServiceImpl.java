@@ -1,5 +1,6 @@
 package com.example.microservice.order_service.service.impl;
 
+import com.example.microservice.order_service.config.TopicConfig;
 import com.example.microservice.order_service.event.OrderPlacedEvent;
 import com.example.microservice.order_service.mapper.OrderMapper;
 import com.example.microservice.order_service.model.Order;
@@ -10,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +24,13 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     OrderRepository orderRepository;
     OrderMapper orderMapper;
     KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
-    static String TOPIC_CREATE_ORDER = "order-creation";
+
 
     @Override
     public OrderResponse createOrder(Order order) {
@@ -38,8 +41,8 @@ public class OrderServiceImpl implements OrderService {
                 .userId(saveOrder.getUserId())
                 .total(saveOrder.getTotal())
                 .build();
-
-        kafkaTemplate.send(TOPIC_CREATE_ORDER, event);
+        log.info("Send event: {} to topic: {}", event, TopicConfig.TOPIC_CREATE_ORDER);
+        kafkaTemplate.send(TopicConfig.TOPIC_CREATE_ORDER, event);
 
         return orderMapper.toOrderResponse(saveOrder);
     }
