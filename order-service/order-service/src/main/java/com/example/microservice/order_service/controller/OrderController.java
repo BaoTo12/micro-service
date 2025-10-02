@@ -44,7 +44,6 @@ public class OrderController {
         return ResponseEntity.ok(orderResponse);
     }
 
-    // Get Orders by User ID with Pagination
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponse>> getOrdersByUserId(@PathVariable Long userId) {
         List<OrderResponse> orders = orderService.getOrdersByUserId(userId);

@@ -27,34 +27,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public User save(User user) {
+    public User createUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
         }
         return userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public User update(Long id, User user) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-
-        // Check if email is being changed and if new email already exists
-        if (!existingUser.getEmail().equals(user.getEmail()) &&
-                userRepository.existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
-        }
-
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-        existingUser.setAddress(user.getAddress());
-        existingUser.setAge(user.getAge());
-        existingUser.setStatus(user.getStatus());
-
-        return userRepository.save(existingUser);
     }
 
     @Override
@@ -68,23 +45,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public void deleteByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
-        userRepository.delete(user);
-    }
-
-    @Override
     @Cacheable(value = USER_CACHE, key = "'all'")
     public List<User> findAll() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public Page<User> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
     }
 
     @Override
@@ -99,45 +62,5 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
-    @Override
-    @Cacheable(value = USER_CACHE, key = "'name_' + #name")
-    public List<User> findByNameContaining(String name) {
-        return userRepository.findByNameContainingIgnoreCase(name);
-    }
 
-
-    @Override
-    public Page<User> findBySearchTerm(String searchTerm, Pageable pageable) {
-        return userRepository.findBySearchTerm(searchTerm, pageable);
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public User activateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        user.setStatus(User.UserStatus.ACTIVE);
-        return userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public User deactivateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        user.setStatus(User.UserStatus.INACTIVE);
-        return userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = {USER_CACHE, USER_COUNT_CACHE}, allEntries = true)
-    public User suspendUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        user.setStatus(User.UserStatus.SUSPENDED);
-        return userRepository.save(user);
-    }
 }

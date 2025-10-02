@@ -1,7 +1,18 @@
 version: '3.8'
 services:
   discovery-server:
-    build: ./discovery-server/discovery-server
+    build:
+      context: ./discovery-server/discovery-server
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./discovery-server/discovery-server/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./discovery-server/discovery-server/pom.xml
     ports:
       - "8761:8761"
     restart: unless-stopped
@@ -10,7 +21,18 @@ services:
       - EUREKA_CLIENT_FETCH_REGISTRY=false
 
   api-gateway:
-    build: ./api-gateway/api-gateway
+    build:
+      context: ./api-gateway/api-gateway
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./api-gateway/api-gateway/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./api-gateway/api-gateway/pom.xml
     ports:
       - "9354:8080"
     restart: unless-stopped
@@ -20,7 +42,18 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
 
   user-service:
-    build: ./user-service/user-service
+    build:
+      context: ./user-service/user-service
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: sync+restart
+          path: .user-service/user-service/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./user-service/user-service/pom.xml
     ports:
       - "8081:8081"
     restart: unless-stopped
@@ -30,9 +63,18 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
 
   order-service:
-    build: ./order-service/order-service
+    build:
+      context: ./order-service/order-service
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./user-service/user-service/src
+          target: /app/src
+        - action: rebuild
+          path: ./user-service/user-service/pom.xml
     ports:
-      - "9333:9333"
+      - "9333:8082"
     restart: unless-stopped
     depends_on:
       - discovery-server

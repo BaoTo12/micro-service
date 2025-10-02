@@ -1,10 +1,17 @@
-FROM maven:3.8.5-openjdk-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
 
-# Use a slim JRE image for the final stage
-FROM openjdk:17-jdk-slim
+# Copy and cache dependencies layer
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Build application
+COPY src ./src
+RUN mvn package -DskipTests -B
+
+# Runtime
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "app.jar"]
