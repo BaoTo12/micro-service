@@ -1,7 +1,6 @@
 package com.example.notification_service.component;
 
-import com.example.microservice.order_service.config.TopicConfig;
-import com.example.microservice.order_service.event.OrderPlacedEvent;
+import com.example.notification_service.event.OrderPlacedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

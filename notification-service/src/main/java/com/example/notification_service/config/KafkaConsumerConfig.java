@@ -1,6 +1,6 @@
 package com.example.notification_service.config;
 
-import com.example.microservice.order_service.event.OrderPlacedEvent;
+import com.example.notification_service.event.OrderPlacedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

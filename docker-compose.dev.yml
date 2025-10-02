@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  discovery-server:
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./discovery-server/discovery-server/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./discovery-server/discovery-server/pom.xml
+
+  api-gateway:
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./api-gateway/api-gateway/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./api-gateway/api-gateway/pom.xml
+
+  user-service:
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./user-service/user-service/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./user-service/user-service/pom.xml
+
+  order-service:
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./order-service/order-service/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./order-service/order-service/pom.xml
+
+  notification-service:
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./notification-service/notification-service/src
+          target: /app/src
+          ignore:
+            - src/test/**
+        - action: rebuild
+          path: ./notification-service/notification-service/pom.xml

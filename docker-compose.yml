@@ -1,38 +1,23 @@
 version: '3.8'
+
 services:
   discovery-server:
     build:
       context: ./discovery-server/discovery-server
       dockerfile: Dockerfile
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./discovery-server/discovery-server/src
-          target: /app/src
-          ignore:
-            - src/test/**
-        - action: rebuild
-          path: ./discovery-server/discovery-server/pom.xml
     ports:
       - "8761:8761"
     restart: unless-stopped
     environment:
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
+    networks:
+      - microservices  # Add this
 
   api-gateway:
     build:
       context: ./api-gateway/api-gateway
       dockerfile: Dockerfile
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./api-gateway/api-gateway/src
-          target: /app/src
-          ignore:
-            - src/test/**
-        - action: rebuild
-          path: ./api-gateway/api-gateway/pom.xml
     ports:
       - "9354:8080"
     restart: unless-stopped
@@ -40,20 +25,13 @@ services:
       - discovery-server
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+    networks:
+      - microservices  # Add this
 
   user-service:
     build:
       context: ./user-service/user-service
       dockerfile: Dockerfile
-    develop:
-      watch:
-        - action: sync+restart
-          path: .user-service/user-service/src
-          target: /app/src
-          ignore:
-            - src/test/**
-        - action: rebuild
-          path: ./user-service/user-service/pom.xml
     ports:
       - "8081:8081"
     restart: unless-stopped
@@ -61,18 +39,13 @@ services:
       - discovery-server
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+    networks:
+      - microservices  # Add this
 
   order-service:
     build:
       context: ./order-service/order-service
       dockerfile: Dockerfile
-    develop:
-      watch:
-        - action: sync
-          path: ./user-service/user-service/src
-          target: /app/src
-        - action: rebuild
-          path: ./user-service/user-service/pom.xml
     ports:
       - "9333:8082"
     restart: unless-stopped
@@ -81,26 +54,89 @@ services:
       - user-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - microservices  # Add this
+
+  notification-service:  # You're missing this service!
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+    depends_on:
+      - discovery-server
+      - kafka
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - microservices  # Add this
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
-    container_name: zookeeper-holy
+    container_name: zookeeper-server
+    restart: unless-stopped
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - microservices  # Add this
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
     container_name: kafka-holy
+    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
       - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-holy:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-server:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  # Changed from localhost
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+    networks:
+      - microservices  # Add this
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - microservices  # Add this
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - microservices  # Add this
+networks:
+  microservices:  # Add this network definition
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

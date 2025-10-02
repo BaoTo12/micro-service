@@ -17,7 +17,7 @@ import java.time.Duration;
 
 @Configuration
 public class RedisConfiguration {
-    @Value("${spring.cache.redis.time-to-live}")
+    @Value("${spring.data.cache.redis.time-to-live}")
     private Duration TIME_TO_LIVE;
 
     @Bean
