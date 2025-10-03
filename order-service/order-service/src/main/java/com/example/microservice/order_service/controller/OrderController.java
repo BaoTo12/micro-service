@@ -1,18 +1,12 @@
 package com.example.microservice.order_service.controller;
 
-import com.example.microservice.order_service.dto.UserDto;
 import com.example.microservice.order_service.model.Order;
 import com.example.microservice.order_service.model.OrderResponse;
-import com.example.microservice.order_service.open_feign.UserClient;
 import com.example.microservice.order_service.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
