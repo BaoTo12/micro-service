@@ -1,10 +1,12 @@
 package com.example.microservice.order_service.service.impl;
 
 import com.example.microservice.order_service.config.TopicConfig;
+import com.example.microservice.order_service.dto.UserDto;
 import com.example.microservice.order_service.event.OrderPlacedEvent;
 import com.example.microservice.order_service.mapper.OrderMapper;
 import com.example.microservice.order_service.model.Order;
 import com.example.microservice.order_service.model.OrderResponse;
+import com.example.microservice.order_service.open_feign.UserClient;
 import com.example.microservice.order_service.repository.OrderRepository;
 import com.example.microservice.order_service.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,11 +32,15 @@ public class OrderServiceImpl implements OrderService {
     OrderRepository orderRepository;
     OrderMapper orderMapper;
     KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+    UserClient userClient;
 
 
     @Override
     public OrderResponse createOrder(Order order) {
+        UserDto userDto = userClient.getUserById(order.getUserId());
+        order.setUserId(userDto.getId());
         Order saveOrder = orderRepository.save(order);
+
         // TODO create event
         OrderPlacedEvent event = OrderPlacedEvent.builder()
                 .orderId(saveOrder.getId())

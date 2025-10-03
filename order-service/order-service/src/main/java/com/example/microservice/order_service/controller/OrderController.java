@@ -25,7 +25,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
     OrderService orderService;
-    UserClient userClient;
 
     // Create Order
     @PostMapping
@@ -38,9 +37,6 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
         OrderResponse orderResponse = orderService.getOrderById(id);
-        // Call User Service by Feign Client
-        UserDto user = userClient.getUserById(orderResponse.getUser().getId());
-        orderResponse.setUser(user);
         return ResponseEntity.ok(orderResponse);
     }
 

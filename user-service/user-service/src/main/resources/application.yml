@@ -10,13 +10,17 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password:
+  jpa:
+    hibernate:
+        ddl-auto: update
+    show-sql: true
+    properties:
+        hibernate:
+          format_sql: true
   h2:
     console:
       enabled: true
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+
   data:
     redis:
       host: localhost
@@ -64,3 +68,12 @@ info:
   app:
     name: ${spring.application.name}
     version: 1.0.0
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+      http:
+        converter:
+          json: DEBUG

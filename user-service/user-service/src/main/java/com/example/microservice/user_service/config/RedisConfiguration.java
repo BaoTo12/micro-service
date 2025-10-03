@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -21,17 +23,15 @@ public class RedisConfiguration {
     private Duration TIME_TO_LIVE;
 
     @Bean
-    public RedisCacheManager redisCacheManager() {
-        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
-
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
         GenericJackson2JsonRedisSerializer jsonRedisSerializer = createValueSerializer();
 
-        cacheConfiguration.entryTtl(TIME_TO_LIVE);
+        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(TIME_TO_LIVE)
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonRedisSerializer));
 
-        cacheConfiguration.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
-        cacheConfiguration.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonRedisSerializer));
-
-        return RedisCacheManager.builder()
+        return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
                 .cacheDefaults(cacheConfiguration)
                 .withCacheConfiguration("users", cacheConfiguration.entryTtl(Duration.ofMinutes(10)))
                 .withCacheConfiguration("userCounts", cacheConfiguration.entryTtl(Duration.ofMinutes(5)))

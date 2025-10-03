@@ -4,7 +4,9 @@ import com.example.microservice.user_service.exception.EmailAlreadyExistsExcepti
 import com.example.microservice.user_service.exception.UserNotFoundException;
 import com.example.microservice.user_service.model.User;
 import com.example.microservice.user_service.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -51,9 +54,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = USER_CACHE, key = "#id", unless = "#result == null || !#result.isPresent()")
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    @Cacheable(value = USER_CACHE, key = "#id", unless = "#result == null")
+    public User findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Cannot find user with id: {}", id);
+                    return new EntityNotFoundException("Cannot find user with id: " + id);
+                });
+        log.info("Found user: {} with id: {}", user, id);
+        return user;
     }
 
     @Override
@@ -62,5 +71,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
-
+    @Override
+    public List<User> getAllUser() {
+        return userRepository.findAll();
+    }
 }

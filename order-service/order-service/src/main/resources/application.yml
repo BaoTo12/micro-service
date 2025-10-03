@@ -66,3 +66,12 @@ management:
       enabled: true
     diskspace:
       enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+      http:
+        converter:
+          json: DEBUG
