@@ -12,7 +12,7 @@ services:
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
       - EUREKA_CLIENT_FETCH_REGISTRY=false
     networks:
-      - microservices  # Add this
+      - microservices
 
   api-gateway:
     build:
@@ -26,7 +26,7 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
     networks:
-      - microservices  # Add this
+      - microservices
 
   user-service:
     build:
@@ -37,10 +37,12 @@ services:
     restart: unless-stopped
     depends_on:
       - discovery-server
+      - redis
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+      - SPRING_DATA_REDIS_HOST=redis
     networks:
-      - microservices  # Add this
+      - microservices
 
   order-service:
     build:
@@ -56,9 +58,9 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
-      - microservices  # Add this
+      - microservices
 
-  notification-service:  # You're missing this service!
+  notification-service:
     build:
       context: ./notification-service
       dockerfile: Dockerfile
@@ -72,7 +74,7 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
-      - microservices  # Add this
+      - microservices
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
@@ -84,11 +86,11 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - microservices  # Add this
+      - microservices
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
-    container_name: kafka-holy
+    container_name: kafka-server
     restart: unless-stopped
     depends_on:
       - zookeeper
@@ -98,11 +100,11 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-server:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  # Changed from localhost
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
     networks:
-      - microservices  # Add this
+      - microservices
 
   prometheus:
     image: prom/prometheus
@@ -117,7 +119,7 @@ services:
       - '--web.enable-lifecycle'
     restart: unless-stopped
     networks:
-      - microservices  # Add this
+      - microservices
 
   grafana:
     image: grafana/grafana
@@ -132,9 +134,17 @@ services:
       - prometheus
     restart: unless-stopped
     networks:
-      - microservices  # Add this
+      - microservices
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - microservices
 networks:
-  microservices:  # Add this network definition
+  microservices:
     driver: bridge
 
 volumes:

@@ -1,5 +1,6 @@
 package com.example.microservice.user_service.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -63,6 +65,7 @@ public class GlobalExceptionHandler {
                 .error("Internal Server Error")
                 .message("An unexpected error occurred")
                 .build();
+        log.error("Found error: {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -13,7 +13,6 @@ public class OrderEventListener {
     @KafkaListener(topics = TopicConfig.TOPIC_CREATE_ORDER, groupId = "notification-group", containerFactory = "orderPlacedEventListenerFactory")
     public void handleOrderEvent(OrderPlacedEvent event) {
         log.info("📨 Nhận được event từ Kafka: {}" , event);
-        // Thực hiện gửi email ở đây
 
     }
 }
