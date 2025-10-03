@@ -34,13 +34,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException("Email already exists: " + user.getEmail());
         }
-        User saveUser = null;
-        try {
-            saveUser = userRepository.save(user);
-        }catch (RuntimeException ex){
-            ex.printStackTrace();
-        }
-        return saveUser;
+        return userRepository.save(user);
     }
 
     @Override
@@ -51,12 +45,6 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
-    }
-
-    @Override
-    @Cacheable(value = USER_CACHE, key = "'all'")
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     @Override
