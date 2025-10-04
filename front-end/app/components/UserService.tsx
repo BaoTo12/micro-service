@@ -8,7 +8,7 @@ interface Props {
   formData: Partial<User>;
   handleCreateUser: (e: React.FormEvent) => void;
   handleDeleteUser: (userId: string) => void;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  setFormData: React.Dispatch<React.SetStateAction<Partial<User>>>;
   setSelectedUserId: (userId: string) => void;
   loading: boolean;
 }
@@ -42,7 +42,7 @@ export default function UserService({
             type="text"
             value={formData.name || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, name: e.target.value }))
+              setFormData((prev: Partial<User>) => ({ ...prev, name: e.target.value }))
             }
             placeholder="Name"
             required
@@ -51,7 +51,7 @@ export default function UserService({
             type="email"
             value={formData.email || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, email: e.target.value }))
+              setFormData((prev: Partial<User>) => ({ ...prev, email: e.target.value }))
             }
             placeholder="Email"
             required
@@ -60,7 +60,7 @@ export default function UserService({
             type="text"
             value={formData.phoneNumber || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, phoneNumber: e.target.value }))
+              setFormData((prev: Partial<User>) => ({ ...prev, phoneNumber: e.target.value }))
             }
             placeholder="Phone Number"
             maxLength={15}
@@ -69,7 +69,7 @@ export default function UserService({
             type="text"
             value={formData.address || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, address: e.target.value }))
+              setFormData((prev: Partial<User>) => ({ ...prev, address: e.target.value }))
             }
             placeholder="Address"
             maxLength={100}
@@ -78,7 +78,7 @@ export default function UserService({
             type="number"
             value={formData.age || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, age: Number(e.target.value) }))
+              setFormData((prev: Partial<User>) => ({ ...prev, age: Number(e.target.value) }))
             }
             placeholder="Age"
             min={0}
@@ -156,7 +156,7 @@ export default function UserService({
                 type="text"
                 value={editForm.name || ""}
                 onChange={(e) =>
-                  setEditForm((prev: any) => ({ ...prev, name: e.target.value }))
+                  setEditForm((prev: Partial<User>) => ({ ...prev, name: e.target.value }))
                 }
                 placeholder="Name"
                 required
@@ -165,7 +165,7 @@ export default function UserService({
                 type="email"
                 value={editForm.email || ""}
                 onChange={(e) =>
-                  setEditForm((prev: any) => ({ ...prev, email: e.target.value }))
+                  setEditForm((prev: Partial<User>) => ({ ...prev, email: e.target.value }))
                 }
                 placeholder="Email"
                 required
@@ -174,7 +174,7 @@ export default function UserService({
                 type="text"
                 value={editForm.phoneNumber || ""}
                 onChange={(e) =>
-                  setEditForm((prev: any) => ({ ...prev, phoneNumber: e.target.value }))
+                  setEditForm((prev: Partial<User>) => ({ ...prev, phoneNumber: e.target.value }))
                 }
                 placeholder="Phone Number"
                 maxLength={15}
@@ -183,7 +183,7 @@ export default function UserService({
                 type="text"
                 value={editForm.address || ""}
                 onChange={(e) =>
-                  setEditForm((prev: any) => ({ ...prev, address: e.target.value }))
+                  setEditForm((prev: Partial<User>) => ({ ...prev, address: e.target.value }))
                 }
                 placeholder="Address"
                 maxLength={100}
@@ -192,12 +192,22 @@ export default function UserService({
                 type="number"
                 value={editForm.age || ""}
                 onChange={(e) =>
-                  setEditForm((prev: any) => ({ ...prev, age: Number(e.target.value) }))
+                  setEditForm((prev: Partial<User>) => ({ ...prev, age: Number(e.target.value) }))
                 }
                 placeholder="Age"
                 min={0}
                 max={150}
               />
+              <select
+                value={editForm.status || "ACTIVE"}
+                onChange={(e) =>
+                  setEditForm((prev: Partial<User>) => ({ ...prev, status: e.target.value as User["status"] }))
+                }
+              >
+                {statusOptions.map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
               <button type="submit">Save Changes</button>
             </form>
           </div>

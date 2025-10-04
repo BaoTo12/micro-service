@@ -124,7 +124,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
@@ -153,6 +153,8 @@ services:
     restart: unless-stopped
     depends_on:
       - api-gateway
+    environment:
+      - NEXT_PUBLIC_API_GATEWAY_URL=http://api-gateway:8080
     networks:
       - microservices
 

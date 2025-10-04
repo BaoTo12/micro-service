@@ -12,12 +12,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [users, setUsers] = useState<User[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    item: "",
-    userId: "",
-  });
+  const [userFormData, setUserFormData] = useState<Partial<User>>({});
+  const [orderFormData, setOrderFormData] = useState<Partial<Order>>({});
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,15 +55,15 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
+          name: userFormData.name,
+          email: userFormData.email,
         }),
       });
       if (!res.ok) throw new Error(`API error: ${res.statusText}`);
       const data: User = await res.json();
       setResponse(JSON.stringify(data, null, 2));
       await fetchUsers(); // Refresh user list
-      setFormData((prev) => ({ ...prev, name: "", email: "" }));
+      setUserFormData({}); // Clear form data
     } catch (err) {
       handleError(err as ApiError);
     } finally {
@@ -122,17 +118,17 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          item: formData.item,
-          userId: formData.userId,
+          item: orderFormData.item,
+          userId: orderFormData.userId,
         }),
       });
       if (!res.ok) throw new Error(`API error: ${res.statusText}`);
       const data: Order = await res.json();
       setResponse(JSON.stringify(data, null, 2));
-      if (formData.userId === selectedUserId) {
+      if (orderFormData.userId === selectedUserId) {
         await fetchOrders(selectedUserId); // Refresh order list
       }
-      setFormData((prev) => ({ ...prev, item: "", userId: "" }));
+      setOrderFormData({}); // Clear form data
     } catch (err) {
       handleError(err as ApiError);
     } finally {
@@ -161,9 +157,11 @@ export default function Home() {
   useEffect(() => {
     if (activeTab === "User Service") {
       fetchUsers();
+      setUserFormData({});
     }
-    // Reset form data when tab changes to avoid stale state
-    setFormData({ name: "", email: "", item: "", userId: "" });
+    if (activeTab === "Order Service") {
+      setOrderFormData({});
+    }
   }, [activeTab, fetchUsers]);
 
   useEffect(() => {
@@ -199,10 +197,10 @@ export default function Home() {
           {activeTab === "User Service" && (
             <UserService
               users={users}
-              formData={formData}
+              formData={userFormData}
               handleCreateUser={handleCreateUser}
               handleDeleteUser={handleDeleteUser}
-              setFormData={setFormData}
+              setFormData={setUserFormData}
               setSelectedUserId={setSelectedUserId}
               loading={loading}
             />
@@ -210,10 +208,10 @@ export default function Home() {
           {activeTab === "Order Service" && (
             <OrderService
               orders={orders}
-              formData={formData}
+              formData={orderFormData}
               handleCreateOrder={handleCreateOrder}
               handleDeleteOrder={handleDeleteOrder}
-              setFormData={setFormData}
+              setFormData={setOrderFormData}
               loading={loading}
             />
           )}
@@ -222,12 +220,6 @@ export default function Home() {
             <div className={styles.error}>
               <h2>Error:</h2>
               <p>{error}</p>
-            </div>
-          )}
-          {response && (
-            <div className={styles.response}>
-              <h2>Response:</h2>
-              <pre>{response}</pre>
             </div>
           )}
         </section>

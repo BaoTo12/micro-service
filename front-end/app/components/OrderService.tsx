@@ -5,10 +5,10 @@ import { Order } from "../types";
 
 interface Props {
   orders: Order[];
-  formData: { item: string; userId: string };
+  formData: Partial<Order>;
   handleCreateOrder: (e: React.FormEvent) => void;
   handleDeleteOrder: (orderId: string) => void;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  setFormData: React.Dispatch<React.SetStateAction<Partial<Order>>>;
   loading: boolean;
 }
 
@@ -27,18 +27,18 @@ export default function OrderService({
         <form className={styles.form} onSubmit={handleCreateOrder}>
           <input
             type="text"
-            value={formData.item}
+            value={formData.item || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, item: e.target.value }))
+              setFormData((prev: Partial<Order>) => ({ ...prev, item: e.target.value }))
             }
             placeholder="Enter order item"
             required
           />
           <input
             type="text"
-            value={formData.userId}
+            value={formData.userId || ""}
             onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, userId: e.target.value }))
+              setFormData((prev: Partial<Order>) => ({ ...prev, userId: e.target.value }))
             }
             placeholder="Enter user ID"
             required

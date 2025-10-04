@@ -6,6 +6,7 @@ export interface User {
   phoneNumber?: string;
   address?: string;
   age?: number;
+  status?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
 }
 
 export interface Order {

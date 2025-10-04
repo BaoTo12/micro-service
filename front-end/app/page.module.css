@@ -12,8 +12,8 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start; /* Stack header and dashboard naturally */
+  align-items: stretch; /* Stretch children to fill width */
   padding: 0; /* Remove top/bottom padding to fix spacing above tab bar */
   min-height: 100vh;
   background: var(--background-dark);
@@ -37,7 +37,8 @@
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
-  margin-top: 0; /* Remove margin above dashboard to fix spacing */
+  margin-top: 0;
+  align-items: start; /* Ensure both columns start at the top */
 }
 
 .sidebar {
@@ -76,7 +77,9 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  /* Remove gap to avoid extra space above first card */
+  align-items: stretch; /* Ensure content is aligned to the top */
+  height: auto;
 }
 
 .card {
@@ -84,7 +87,12 @@
   border-radius: 1rem;
   box-shadow: 0 2px 16px #00000033;
   padding: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 0; /* Ensure no top margin above card */
+}
+
+/* Add margin only to cards that are not the first child */
+.content .card + .card {
+  margin-top: 2rem;
 }
 
 .form {
@@ -197,6 +205,7 @@
   font-weight: 700;
   color: var(--accent);
   margin-bottom: 1rem;
+  margin-top: 0; /* Ensure no top margin above section header */
 }
 
 /* Add modal styles for user editing */
