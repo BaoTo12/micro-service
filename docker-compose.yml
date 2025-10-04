@@ -143,6 +143,19 @@ services:
     restart: unless-stopped
     networks:
       - microservices
+
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3000"
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    networks:
+      - microservices
+
 networks:
   microservices:
     driver: bridge
